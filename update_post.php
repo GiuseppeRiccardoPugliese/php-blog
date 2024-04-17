@@ -91,6 +91,34 @@ include 'header.php';
                     rows="5"><?php echo $post['content']; ?></textarea>
             </div>
 
+            <select class="form-select mb-3 w-25" aria-label="Seleziona la categoria" name="category">
+                <option>Scegli la categoria</option>
+                <?php
+                // Connessione al database
+                $conn = new mysqli("127.0.0.1", "root", "root", "php-blog");
+
+                // Controllo la connessione
+                if ($conn->connect_error) {
+                    die("Connessione al database fallita: " . $conn->connect_error);
+                }
+
+                // Eseguo la query per ottenere le categorie
+                $sql = "SELECT * FROM categories";
+                $result = $conn->query($sql);
+
+                // Output delle opzioni per la select
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        if ($post['category_id'] == $row['id']) {
+                            echo "<option selected value='" . $row['id'] . "'>" . $row['name'] . "</option>";
+                        } else {
+                            echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
+                        }
+                    }
+                }
+                ?>
+            </select>
+
             <button type="submit" class="btn btn-primary">Salva Modifiche</button>
         </form>
 </body>

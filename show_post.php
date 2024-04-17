@@ -19,7 +19,8 @@ if (isset($_GET["id"])) {
 }
 
 // Query per selezionare il post dall'ID specificato
-$sql = "SELECT * FROM posts WHERE id = $post_id";
+$sql = "SELECT * FROM posts JOIN categories ON posts.category_id = categories.id WHERE posts.id = $post_id";
+
 $result = $conn->query($sql);
 
 // Verifico se il post esiste
@@ -48,11 +49,14 @@ include 'header.php';
 <body>
     <h1 class="text-center m-2">Dettagli Post</h1>
     <div class="container">
-        <div class="card my-2">
+        <div class="card text-bg-light my-2">
             <img src="<?php echo $post['image']; ?>" class="card-img-top" alt="Post-Img">
             <div class="card-body">
                 <h5 class="card-title"><?php echo $post['title']; ?></h5>
                 <p class="card-text"><?php echo $post['content']; ?></p>
+                <!-- <small class="card-subtitle"><?php echo $post['name']; ?></small> -->
+                <footer class="card-text blockquote-footer">Categoria: <cite
+                        title="Source Title"><?php echo $post['name']; ?></cite></footer>
             </div>
         </div>
         <!-- Altri dettagli del post... -->

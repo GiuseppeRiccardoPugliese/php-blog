@@ -22,14 +22,36 @@ session_start();
         <form action="create_post.php" method="POST">
             <div class="mb-3">
                 <label for="title" class="form-label">Titolo:</label>
-                <input type="text" id="title" name="title" class="form-control" placeholder='Soy un malessere'>
+                <input type="text" id="title" name="title" class="form-control" required>
             </div>
             <div class="mb-3">
                 <label for="content" class="form-label">Contenuto:</label>
-                <textarea placeholder='El mejor malessere de la ciudad' id="content" name="content" class="form-control"
-                    rows="5"></textarea>
+                <textarea id="content" name="content" class="form-control" rows="5" required></textarea>
             </div>
+            <select id="category" class="form-select mb-3 w-25" aria-label="Seleziona la categoria" name="category"
+                required>
+                <option value="" disabled selected>Scegli la categoria</option>
+                <?php
+                // Connessione al database
+                $conn = new mysqli("127.0.0.1", "root", "root", "php-blog");
 
+                // Controllo la connessione
+                if ($conn->connect_error) {
+                    die("Connessione al database fallita: " . $conn->connect_error);
+                }
+
+                // Eseguo la query per ottenere le categorie
+                $sql = "SELECT * FROM categories";
+                $result = $conn->query($sql);
+
+                // Output delle opzioni per la select
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
+                    }
+                }
+                ?>
+            </select>
             <button type="submit" class="btn btn-primary">Crea Post</button>
         </form>
     </div>
@@ -56,19 +78,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title = $_POST["title"];
     $content = $_POST["content"];
     $user_id = $_SESSION["user_id"];
+    $category_id = $_POST["category"];
     // Altri campi del form...
 
-    // Connessione al database
-    $conn = new mysqli("127.0.0.1", "root", "root", "php-blog");
-
-    // Controllo la connessione
-    if ($conn->connect_error) {
-        die("Connessione al database fallita: " . $conn->connect_error);
-    }
-
     // Eseguo l'inserimento dei dati nel database
-    $stmt = $conn->prepare("INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $title, $content, $user_id);
+    $stmt = $conn->prepare("INSERT INTO posts (title, content, user_id, category_id) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssii", $title, $content, $user_id, $category_id); // Modifica dei parametri della bind_param per includere anche la categoria
 
     if ($stmt->execute()) {
         // Inserimento riuscito, redirect alla dashboard
