@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST["password"];
 
     // Connessione al database
-    $conn = new mysqli("127.0.0.1", "root", "root", "php-blog");
+    $conn = new mysqli("localhost", "root", "root", "php-blog");
 
     // Controllo la connessione
     if ($conn->connect_error) {

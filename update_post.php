@@ -9,7 +9,7 @@ if (!isset($_SESSION["username"])) {
 }
 
 // Connessione al database
-$conn = new mysqli("127.0.0.1", "root", "root", "php-blog");
+$conn = new mysqli("localhost", "root", "root", "php-blog");
 
 // Controllo la connessione
 if ($conn->connect_error) {
@@ -30,13 +30,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_GET["id"])) {
     $stmt->bind_param("ssi", $title, $content, $post_id);
 
     if ($stmt->execute()) {
-        // Aggiornamento riuscito, reindirizza alla dashboard o mostra un messaggio di successo
-        header("Location: dashboard.php");
-        exit();
+        // Aggiornamento riuscito, esegui l'upload dell'immagine se è stata fornita
+        if (isset($_FILES["newImage"]) && $_FILES["newImage"]["error"] == UPLOAD_ERR_OK) {
+            // Visualizza il nome del file newImage
+            echo $_FILES["newImage"]["name"];
+            
+            include 'upload_image.php'; // Includi il file di upload dell'immagine
+            exit(); // Termina lo script dopo l'upload dell'immagine
+        } else {
+            // Se non è stata fornita alcuna immagine, reindirizza alla dashboard o mostra un messaggio di successo
+            header("Location: dashboard.php");
+            exit();
+        }
     } else {
         // Errore durante l'aggiornamento, mostra un messaggio di errore
         echo "Errore durante l'aggiornamento del post nel database.";
     }
+
 
     $stmt->close();
 }
@@ -80,7 +90,7 @@ include 'header.php';
     <div class="container mt-5">
         <h1>Modifica Post</h1>
 
-        <form action="update_post.php?id=<?php echo $post_id; ?>" method="POST">
+        <form action="update_post.php?id=<?php echo $post_id; ?>" method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="title" class="form-label">Titolo:</label>
                 <input type="text" id="title" name="title" class="form-control" value="<?php echo $post['title']; ?>">
@@ -95,7 +105,7 @@ include 'header.php';
                 <option>Scegli la categoria</option>
                 <?php
                 // Connessione al database
-                $conn = new mysqli("127.0.0.1", "root", "root", "php-blog");
+                $conn = new mysqli("localhost", "root", "root", "php-blog");
 
                 // Controllo la connessione
                 if ($conn->connect_error) {
@@ -119,8 +129,39 @@ include 'header.php';
                 ?>
             </select>
 
+
+
             <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+            <div class="col-3">
+
+                <?php
+                
+
+                    // Secondo metodo con funzione JavaScript
+                    echo '<div style="cursor: pointer;" onclick="openFileInput();">';
+                    echo '<img src="' . $post['image'] . '" alt="Inserisci immagine" class="w-100 pt-4" id="newImage">';
+                    echo '</div>';
+                    echo '<input type="file" name="newImage" id="fileInput" style="display: none;" onchange="updateImage(this);">';
+                
+                ?>
+
+            </div>
+
         </form>
 </body>
+<script>
+    function openFileInput() {
+        document.getElementById('fileInput').click();
+    }
+    function updateImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('newImage').src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 
 </html>
