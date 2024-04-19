@@ -35,7 +35,9 @@ include 'header.php';
             while ($row = $result->fetch_assoc()) {
                 ?>
                 <div class="card my-2">
-                    <img src="<?php echo $row['image']; ?>" class="card-img-top" alt="Post-Img">
+                    <div class="d-flex justify-content-center ">
+                        <img src="<?php echo $row['image']; ?>" class="card-img-top p-2" alt="Post-Img" style="width: 18rem;">
+                    </div>
                     <div class="card-body">
                         <h5 class="card-title"><?php echo $row['title']; ?></h5>
                         <p class="card-text"><?php echo $row['content']; ?></p>

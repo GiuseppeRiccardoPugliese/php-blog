@@ -50,7 +50,9 @@ include 'header.php';
     <h1 class="text-center m-2">Dettagli Post</h1>
     <div class="container">
         <div class="card text-bg-light my-2">
-            <img src="<?php echo $post['image']; ?>" class="card-img-top" alt="Post-Img">
+            <div class="d-flex justify-content-center ">
+                <img src="<?php echo $post['image']; ?>" class="card-img-top p-2" alt="Post-Img" style="width: 18rem;">
+            </div>
             <div class="card-body">
                 <h5 class="card-title"><?php echo $post['title']; ?></h5>
                 <p class="card-text"><?php echo $post['content']; ?></p>

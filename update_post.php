@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_GET["id"])) {
         if (isset($_FILES["newImage"]) && $_FILES["newImage"]["error"] == UPLOAD_ERR_OK) {
             // Visualizza il nome del file newImage
             echo $_FILES["newImage"]["name"];
-            
+
             include 'upload_image.php'; // Includi il file di upload dell'immagine
             exit(); // Termina lo script dopo l'upload dell'immagine
         } else {
@@ -129,23 +129,21 @@ include 'header.php';
                 ?>
             </select>
 
-
-
-            <button type="submit" class="btn btn-primary">Salva Modifiche</button>
-            <div class="col-3">
+            <div class="col-3 mb-2">
 
                 <?php
-                
 
-                    // Secondo metodo con funzione JavaScript
-                    echo '<div style="cursor: pointer;" onclick="openFileInput();">';
-                    echo '<img src="' . $post['image'] . '" alt="Inserisci immagine" class="w-100 pt-4" id="newImage">';
-                    echo '</div>';
-                    echo '<input type="file" name="newImage" id="fileInput" style="display: none;" onchange="updateImage(this);">';
-                
+                // Secondo metodo con funzione JavaScript
+                echo '<div style="cursor: pointer;" onclick="openFileInput();">';
+                echo '<img src="' . $post['image'] . '" alt="Inserisci immagine" class="w-100 pt-4" id="newImage">';
+                echo '</div>';
+                echo '<input type="file" name="newImage" id="fileInput" style="display: none;" onchange="updateImage(this);">';
+
                 ?>
 
             </div>
+
+            <button type="submit" class="btn btn-primary">Salva Modifiche</button>
 
         </form>
 </body>
