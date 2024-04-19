@@ -22,7 +22,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["newImage"])) {
             // Sostituisci questo con la tua logica per l'aggiornamento nel database
             $newImagePath = $filePath;
             // Supponiamo che tu abbia già l'ID del post
-            $postId = $post['id'];
             // Esegui l'aggiornamento del percorso dell'immagine nel database
             // Sostituisci questo con la tua logica per l'aggiornamento nel database
             // $conn è la tua connessione al database
@@ -34,18 +33,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["newImage"])) {
             }
             $sql = "UPDATE posts SET image = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("si", $newImagePath, $postId);
-            $stmt->execute();
-            $stmt->close();
-
-            // Reindirizza l'utente alla pagina precedente
-            header("Location: {$_SERVER['HTTP_REFERER']}");
-            exit;
+            $stmt->bind_param("si", $newImagePath, $post_id);
+            if ($stmt->execute()) {
+                // Aggiornamento riuscito, reindirizza l'utente
+                header("Location: {$_SERVER['HTTP_REFERER']}");
+                exit();
+            } else {
+                // Se si verifica un errore durante l'aggiornamento, mostra un messaggio di errore
+                echo "Errore durante l'aggiornamento del percorso dell'immagine nel database.";
+            }
         } else {
             echo "Si è verificato un errore durante il caricamento del file.";
         }
     } else {
-        echo "Si è verificato un errore durante l'upload del file.";
+        echo "Si è verificato un errore durante il caricamento del file.";
     }
 }
 ?>

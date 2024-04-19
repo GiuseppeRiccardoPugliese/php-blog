@@ -30,41 +30,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_GET["id"])) {
     $stmt->bind_param("ssi", $title, $content, $post_id);
 
     if ($stmt->execute()) {
-        if ($_FILES["newImage"]["error"] == UPLOAD_ERR_OK) {
-            // Directory dove verranno salvate le immagini
+        // Aggiornamento riuscito, esegui l'upload dell'immagine se è stata fornita
+        if (isset($_FILES["newImage"]) && $_FILES["newImage"]["error"] == UPLOAD_ERR_OK) {
+            // Visualizza il nome del file newImage
+            echo $_FILES["newImage"]["name"];
             
-            $uploadDir = 'uploads/';
-
-            // Ottieni il percorso temporaneo del file caricato
-            $tmpFilePath = $_FILES['newImage']['tmp_name'];
-
-            // Ottieni il nome del file originale
-            $fileName = $_FILES['newImage']['name'];
-
-            // Genera un nome univoco per il file
-            $filePath = $uploadDir . uniqid() . '_' . $fileName;
-
-            // Sposta il file temporaneo nella directory di destinazione
-            if (move_uploaded_file($tmpFilePath, $filePath)) {
-                // Il caricamento del nuovo file è avvenuto con successo
-
-                // Effettua l'aggiornamento del percorso dell'immagine nel database
-                $newImagePath = $filePath;
-                $sql = "UPDATE posts SET image = ? WHERE id = ?";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("si", $newImagePath, $post_id);
-                $stmt->execute();
-            } else {
-                echo "Si è verificato un errore durante il caricamento del file.";
-            }
+            include 'upload_image.php'; // Includi il file di upload dell'immagine
+            exit(); // Termina lo script dopo l'upload dell'immagine
+        } else {
+            // Se non è stata fornita alcuna immagine, reindirizza alla dashboard o mostra un messaggio di successo
+            header("Location: dashboard.php");
+            exit();
         }
-        // Aggiornamento riuscito, reindirizza alla dashboard o mostra un messaggio di successo
-        header("Location: dashboard.php");
-        exit();
     } else {
         // Errore durante l'aggiornamento, mostra un messaggio di errore
         echo "Errore durante l'aggiornamento del post nel database.";
     }
+
 
     $stmt->close();
 }
@@ -108,7 +90,7 @@ include 'header.php';
     <div class="container mt-5">
         <h1>Modifica Post</h1>
 
-        <form action="update_post.php?id=<?php echo $post_id; ?>" method="POST">
+        <form action="update_post.php?id=<?php echo $post_id; ?>" method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="title" class="form-label">Titolo:</label>
                 <input type="text" id="title" name="title" class="form-control" value="<?php echo $post['title']; ?>">
@@ -153,15 +135,14 @@ include 'header.php';
             <div class="col-3">
 
                 <?php
-                if ($post['image'] != null) {
-
+                
 
                     // Secondo metodo con funzione JavaScript
                     echo '<div style="cursor: pointer;" onclick="openFileInput();">';
-                    echo '<img src="' . $post['image'] . '" alt="" class="w-100" id="postImage">';
+                    echo '<img src="' . $post['image'] . '" alt="Inserisci immagine" class="w-100 pt-4" id="newImage">';
                     echo '</div>';
                     echo '<input type="file" name="newImage" id="fileInput" style="display: none;" onchange="updateImage(this);">';
-                }
+                
                 ?>
 
             </div>
@@ -176,7 +157,7 @@ include 'header.php';
         if (input.files && input.files[0]) {
             var reader = new FileReader();
             reader.onload = function (e) {
-                document.getElementById('postImage').src = e.target.result;
+                document.getElementById('newImage').src = e.target.result;
             };
             reader.readAsDataURL(input.files[0]);
         }
